@@ -12,7 +12,8 @@ server.listen(8084);
 
 
 //const path = 'http://meteoinfo.by/radar/UKBB/UKBB_latest.png';
-const path = 'http://localhost:8030/borispol-radar2/src/img/meteoradar_borispol.png';
+//const path = 'http://localhost:8030/borispol-radar2/src/img/meteoradar_borispol.png';
+const path = 'http://localhost:8030/parserain/urbb_debug.jpg';
 const mathDate = new MathDate();
 
 const hashDate = {};
@@ -35,7 +36,7 @@ app.get('/parserain', (req, res, next) => {
 		for(let key in hashDate){
 			delete hashDate[key]
 		}
-		console.log('clear hash ->')
+		console.log('clear hash ->', new Date().toISOString())
 	}, 60000);
 
 	if(!hashDate[currentHash]){
