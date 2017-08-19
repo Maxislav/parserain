@@ -1,14 +1,18 @@
 const center = require('./radar-center');
+
 /**
  * @type {MyMath}
  */
 const MyMath = require('./MyMath');
+
+
+
 /**
  * @param {RadarCenter}_center
- * @param a
+ * @param {number}a угол 0 ... 360
  * @return {{x: number, y: number}}
  */
-function xy(_center, a) {
+const xy = (_center, a) =>{
 
 	if(360<a){
 		a = a-360
