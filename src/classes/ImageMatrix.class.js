@@ -24,6 +24,7 @@ class ImageMatrix extends Array {
 			if (!this[x]) this[x] = [];
 		}
 		this.list = null;
+		this._isRainy = false;
 
 
 	}
@@ -38,6 +39,10 @@ class ImageMatrix extends Array {
 		return this;
 	}
 
+	/**
+	 * Превращает в одномерный массив
+	 * @return {Array|null}
+	 */
 	toArray() {
 		if (!this.list) {
 			this.list = [];
@@ -60,12 +65,23 @@ class ImageMatrix extends Array {
 	distByPixel(origin, a) {
 		let rain = this.toArray();
 
+		const filterByColor = rain.filter((item) => {
+			return constantRadarColor.find((val) => {
+				const find = Math.abs(item.dec - val.colorDec) < 1000;
+				if (find) {
+					item.text = val.text;
+					item.intensity = val.intensity
+					if(!this._isRainy) this._isRainy = true
+				}
+				return find
+			});
+		});
 
-		if (a) {
-			a = MyMath.normalizeDegree(a);
-			const {x, y} = origin;
-			rain = rain.filter(p => {
+		const filterByDirection = filterByColor.filter(p=>{
+			if(a) {
+				a = MyMath.normalizeDegree(a);
 				let _a;
+				const {x, y} = origin;
 				if (x < p.x && p.y < y) {
 					_a = (Math.atan((p.x - x) / (y - p.y)))
 				} else if (x < p.x && y < p.y) {
@@ -77,25 +93,15 @@ class ImageMatrix extends Array {
 				}
 				_a = MyMath.degrees(_a);
 				return Math.abs(a - _a) < 15
-			})
-		}
-
-		const filterByColor = rain.filter((item) => {
-			return constantRadarColor.find((val) => {
-				const find = Math.abs(item.dec - val.colorDec) < 1000;
-				if (find) {
-					item.text = val.text
-					item.intensity = val.intensity
-				}
-				return find
-			});
+			}
+			else return true;
 		});
 
-		filterByColor.forEach(r => {
+		filterByDirection.forEach(r => {
 			r.setDistFrom(origin.x, origin.y)
 		});
 
-		filterByColor.sort((a, b) => {
+		filterByDirection.sort((a, b) => {
 			if (a.dist < b.dist) {
 				return -1
 			}
@@ -110,7 +116,7 @@ class ImageMatrix extends Array {
 		const colors = [];
 
 
-		return filterByColor
+		return filterByDirection
 			.filter(function (value, index, arr) {
 				const find = colors.find((val) => {
 					return Math.abs(value.dec - val) < 10
@@ -132,7 +138,7 @@ class ImageMatrix extends Array {
 			})
 	}
 	isRainy(){
-		return 0<this.distByPixel({x:200, y:200}, null).length
+		return this._isRainy
 	}
 
 	/**
