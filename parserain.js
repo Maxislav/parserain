@@ -48,6 +48,7 @@ app.get('/parserain', (req, res, next) => {
 	if (!hashDate[currentHash]) {
 		hashDate[currentHash] = new Deferred(I);
 		new Promise((resolve, rej) => {
+        setTimeout(()=>{
 			Jimp.read(path, function (err, image) {
 				if (err) {
 					console.error('meteoinfo error->', err);
@@ -79,6 +80,9 @@ app.get('/parserain', (req, res, next) => {
 					isRainy: imageMatrix.isRainy()
 				})
 			})
+        }, 20)
+
+			
 		})
 			.then(res => {
 				hashDate[currentHash].resolve(res)
