@@ -40,7 +40,7 @@ class ColorConstant extends Array{
 				text: 'Конвективные осадки слабые'
 			},
 			{
-				hex: '2550e5',
+				hex: '0c59ff', //206cfd
 				text: 'Конвективные осадки умерянные'
 			},
 			{
