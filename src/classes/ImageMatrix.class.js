@@ -130,7 +130,7 @@ class ImageMatrix extends Array {
 			.map(it => {
 				return {
 					intensity: it.intensity,
-					dist: it.dist,
+					dist: parseInt(it.dist),
 					text: it.text,
 					x: it.x,
 					y: it.y
