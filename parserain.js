@@ -47,25 +47,40 @@ app.get('/parserain', (req, res, next) => {
 					rej(err);
 					return;
 				}
-				const imageMatrix = new ImageMatrix();
+
 				image.crop(0, 0, 505, 480);
+				const imageMatrix = new ImageMatrix( image.bitmap.width, image.bitmap.height);
 				image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
-					if (!imageMatrix[x]) imageMatrix[x] = [];
 					const red = image.bitmap.data[idx];
 					const green = image.bitmap.data[idx + 1];
 					const blue = image.bitmap.data[idx + 2];
 					const alpha = image.bitmap.data[idx + 3];
 					const imageColor = new ImageColor(red, green, blue, alpha);
+					imageColor.x = x;
+					imageColor.y = y;
 					imageMatrix[x][y] = imageColor;
 					imageMatrix[x][y] = imageColor;
 				});
-				const direction = getDirection(imageMatrix)
-				resolve(direction ? ''+direction : null)
+
+
+				const direction = getDirection(imageMatrix);
+
+			 const dist =	imageMatrix.dist({x:100, y:100}, direction+180)
+			dist
+				//const distanceClass = new DistanceClass(image.bitmap.width, image.bitmap.height);
+			//	distanceClass.setImageMatrix(imageMatrix);
+
+
+
+
+				//resolve(direction ? ''+direction : null)
+				resolve(dist)
 			})
 		})
 	}
-	hashDate[currentHash].then(direction=>{
-		res.end(direction)
+	hashDate[currentHash].then(result=>{
+		res.setHeader('Content-Type', 'application/json');
+		res.send(JSON.stringify(result, null, 3))
 	})
 		.catch(err=>{
 			res.status(500).send({error: 'meteoinfo error'});
