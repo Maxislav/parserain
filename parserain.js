@@ -6,7 +6,7 @@ const ImageMatrix = require('./src/classes/ImageMatrix.class');
 const ImageColor = require('./src/classes/ImageColor.class');
 const {getDirection} = require('./src/get-direction');
 const MathDate = require('./src/classes/MathDate');
-
+const Deferred = require('./src/classes/DeferClass');
 const server = require('http').Server(app);
 server.listen(8084);
 
@@ -19,8 +19,6 @@ const mathDate = new MathDate();
 const hashDate = {};
 
 
-
-
 let timeoutClearHasId = 0;
 
 app.get('/parserain', (req, res, next) => {
@@ -29,22 +27,23 @@ app.get('/parserain', (req, res, next) => {
 	 * @type {{lat:number|undefined, lng:number|undefined }}
 	 */
 	const query = url_parts.query;
-	const currentHash = mathDate.getCurrentDate().toISOString() +'.' + query.lat+ '.' +query.lng;
+	const currentHash = mathDate.getCurrentDate().toISOString() + '.' + query.lat + '.' + query.lng;
 
 
-	const {lat = 50.44701, lng =30.49} = query
+	const {lat = 50.44701, lng = 30.49} = query
 
 
 	timeoutClearHasId && clearTimeout(timeoutClearHasId);
-	timeoutClearHasId = setTimeout(()=>{
-		for(let key in hashDate){
+	timeoutClearHasId = setTimeout(() => {
+		for (let key in hashDate) {
 			delete hashDate[key]
 		}
 		console.log('clear hash ->', new Date().toISOString())
 	}, 60000);
 
-	if(!hashDate[currentHash]){
-		hashDate[currentHash] = new Promise((resolve, rej)=>{
+	if (!hashDate[currentHash]) {
+		hashDate[currentHash] = new Deferred();
+		new Promise((resolve, rej) => {
 			Jimp.read(path, function (err, image) {
 				if (err) {
 					console.error('meteoinfo error->', err);
@@ -53,7 +52,7 @@ app.get('/parserain', (req, res, next) => {
 				}
 
 				image.crop(0, 0, 505, 480);
-				const imageMatrix = new ImageMatrix( image.bitmap.width, image.bitmap.height);
+				const imageMatrix = new ImageMatrix(image.bitmap.width, image.bitmap.height);
 				image.scan(0, 0, image.bitmap.width, image.bitmap.height, function (x, y, idx) {
 					const red = image.bitmap.data[idx];
 					const green = image.bitmap.data[idx + 1];
@@ -69,7 +68,7 @@ app.get('/parserain', (req, res, next) => {
 
 				const direction = getDirection(imageMatrix);
 				console.log('direction ->', direction)
-			  const dist =	imageMatrix.distByLatLng({lat: parseFloat(lat), lng:parseFloat(lng)}, direction+180);
+				const dist = imageMatrix.distByLatLng({lat: parseFloat(lat), lng: parseFloat(lng)}, direction + 180);
 				resolve({
 					direction,
 					dist: dist,
@@ -77,17 +76,20 @@ app.get('/parserain', (req, res, next) => {
 				})
 			})
 		})
+			.then(res => {
+				hashDate[currentHash].resolve(res)
+			})
 	}
-	hashDate[currentHash].then(result=>{
-		res.setHeader('Content-Type', 'application/json');
-		res.send(JSON.stringify(result, null, 3));
-		console.log('resolve ->', result)
-	})
-		.catch(err=>{
+	return hashDate[currentHash]
+		.promise
+		.then(result => {
+			res.setHeader('Content-Type', 'application/json');
+			res.send(JSON.stringify(result, null, 3));
+			console.log('resolve ->', result)
+		})
+		.catch(err => {
 			res.status(500).send({error: 'meteoinfo error'});
 		})
-
-
 
 
 });
