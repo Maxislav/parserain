@@ -143,8 +143,11 @@ class ImageMatrix extends Array {
 	 */
 
 	distByLatLng(origin, a){
-		const x = (this._width/(33.8-27.9)) *(origin.lng - 27.9)
-		const y = (this._height/(52.1-48.2))* (52.1 - origin.lat)
+		const x = (this._width/(33.8-27.9)) *(origin.lng - 27.9);
+		const y = (this._height/(52-48.8))* (52 - origin.lat);
+
+		console.log('lng lat - >', origin.lng+", " +origin.lat, " x: "+ x, "y: "+y)
+
 		return this.distByPixel({x,y}, a);
 	}
 

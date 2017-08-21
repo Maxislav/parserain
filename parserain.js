@@ -32,7 +32,7 @@ app.get('/parserain', (req, res, next) => {
 	const currentHash = mathDate.getCurrentDate().toISOString() +'.' + query.lat+ '.' +query.lng;
 
 
-	const {lat = 50.44701, lng =30.52002} = query
+	const {lat = 50.44701, lng =30.49} = query
 
 
 	timeoutClearHasId && clearTimeout(timeoutClearHasId);
@@ -71,6 +71,7 @@ app.get('/parserain', (req, res, next) => {
 				console.log('direction ->', direction)
 			  const dist =	imageMatrix.distByLatLng({lat: parseFloat(lat), lng:parseFloat(lng)}, direction+180);
 				resolve({
+					direction,
 					dist: dist,
 					isRainy: imageMatrix.isRainy()
 				})

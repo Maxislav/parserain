@@ -7,7 +7,7 @@ class ColorConstant extends Array{
 		super();
 		ColorConstant.const.map((item, i)=>{
 			const color = {
-				intensity: i,
+				intensity: i+2,
 				text:item.text,
 				hex: item.hex,
 				colorHex: '#'+item.hex,

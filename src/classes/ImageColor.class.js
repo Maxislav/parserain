@@ -49,30 +49,15 @@ class ImageColor extends Array {
 	 * @private
 	 */
 	static _toHex(r, g, b, a) {
-
 		let hex = '';
-
 		new Array(...arguments).forEach((color, i)=>{
 			if(i<3){
 				let c = color.toString(16);
 				if (c.length<2) c = '0'+c;
 				hex+=c
 			}
-		})
-	/*
-		for(let opt in this.rgba){
-			if(opt!='a'){
-				let c = this.rgba[opt].toString(16);
-				if (c.length<2) c = '0'+c;
-				hex+=c
-			}
-		}*/
+		});
 		return hex;
-
-
-		if (r > 255 || g > 255 || b > 255 || a > 255)
-			throw "Invalid color component";
-		return (256 + r).toString(16).substr(1) + ((1 << 24) + (g << 16) | (b << 8) | a).toString(16).substr(1);
 	}
 
 }
