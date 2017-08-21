@@ -20,8 +20,12 @@ const hashDate = {};
 
 
 let timeoutClearHasId = 0;
-
+let I = 0;
 app.get('/parserain', (req, res, next) => {
+
+	I++;
+
+	console.log(I)
 	const url_parts = url.parse(req.url, true);
 	/**
 	 * @type {{lat:number|undefined, lng:number|undefined }}
@@ -30,7 +34,7 @@ app.get('/parserain', (req, res, next) => {
 	const currentHash = mathDate.getCurrentDate().toISOString() + '.' + query.lat + '.' + query.lng;
 
 
-	const {lat = 50.44701, lng = 30.49} = query
+	const {lat = 50.44701, lng = 30.49} = query;
 
 
 	timeoutClearHasId && clearTimeout(timeoutClearHasId);
@@ -42,7 +46,7 @@ app.get('/parserain', (req, res, next) => {
 	}, 60000);
 
 	if (!hashDate[currentHash]) {
-		hashDate[currentHash] = new Deferred();
+		hashDate[currentHash] = new Deferred(I);
 		new Promise((resolve, rej) => {
 			Jimp.read(path, function (err, image) {
 				if (err) {
@@ -78,14 +82,16 @@ app.get('/parserain', (req, res, next) => {
 		})
 			.then(res => {
 				hashDate[currentHash].resolve(res)
+
 			})
 	}
 	return hashDate[currentHash]
 		.promise
 		.then(result => {
+			const  i = hashDate[currentHash].i;
 			res.setHeader('Content-Type', 'application/json');
 			res.send(JSON.stringify(result, null, 3));
-			console.log('resolve ->', result)
+			console.log('resolve ->',  i,  result)
 		})
 		.catch(err => {
 			res.status(500).send({error: 'meteoinfo error'});

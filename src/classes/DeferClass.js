@@ -1,6 +1,11 @@
 class Deferred{
-	constructor(){
+	/**
+	 *
+	 * @param {number?} i
+	 */
+	constructor(i){
 
+		this._i  = i;
 		this._res = null;
 		this._rej = null;
 		this._d = null;
@@ -16,7 +21,6 @@ class Deferred{
 		this._on = () =>{
 
 		}
-
 	}
 
 	resolve(d){
@@ -36,6 +40,9 @@ class Deferred{
 		return this._promise
 	}
 
+	get i (){
+		return this._i;
+	}
 
 }
 
