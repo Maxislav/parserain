@@ -21,6 +21,9 @@ class ImageColor extends Array {
 
 		this.x = null;
 		this.y = null;
+		this.dist = null;
+		this.intensity = null;
+		this.text = null;
 
 	}
 
@@ -28,7 +31,6 @@ class ImageColor extends Array {
 		const X = Math.abs(x-this.x);
 		const Y = Math.abs(y-this.y);
 		this.dist = Math.pow( Math.pow(X, 2)+ Math.pow(Y, 2), 1/2)*(400/470);
-
 		return this.dist
 	}
 

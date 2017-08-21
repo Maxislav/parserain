@@ -51,13 +51,19 @@ class ImageMatrix extends Array {
 	}
 
 
-	dist(original, a) {
+	/**
+	 *
+	 * @param {{x:number, y:number}} origin координата в пикселях
+	 * @param {number | null} a угол ветра
+	 * @return {Array}
+	 */
+	distByPixel(origin, a) {
 		let rain = this.toArray();
 
 
 		if (a) {
 			a = MyMath.normalizeDegree(a);
-			const {x, y} = original;
+			const {x, y} = origin;
 			rain = rain.filter(p => {
 				let _a;
 				if (x < p.x && p.y < y) {
@@ -79,13 +85,14 @@ class ImageMatrix extends Array {
 				const find = Math.abs(item.dec - val.colorDec) < 1000;
 				if (find) {
 					item.text = val.text
+					item.intensity = val.intensity
 				}
 				return find
 			});
 		});
 
 		filterByColor.forEach(r => {
-			r.setDistFrom(original.x, original.y)
+			r.setDistFrom(origin.x, origin.y)
 		});
 
 		filterByColor.sort((a, b) => {
@@ -116,13 +123,32 @@ class ImageMatrix extends Array {
 			})
 			.map(it => {
 				return {
+					intensity: it.intensity,
 					dist: it.dist,
 					text: it.text,
 					x: it.x,
 					y: it.y
 				}
 			})
-	};
+	}
+	isRainy(){
+		return 0<this.distByPixel({x:200, y:200}, null).length
+	}
+
+	/**
+	 *
+	 * @param {{lat:number, lng:number}} origin координата в lat lng
+	 * @param {number | null} a угол ветра
+	 * @return {Array}
+	 */
+
+	distByLatLng(origin, a){
+		const x = (this._width/(33.8-27.9)) *(origin.lng - 27.9)
+		const y = (this._height/(52.1-48.2))* (52.1 - origin.lat)
+		return this.distByPixel({x,y}, a);
+	}
+
+
 
 
 }

@@ -11,9 +11,9 @@ const server = require('http').Server(app);
 server.listen(8084);
 
 
-//const path = 'http://meteoinfo.by/radar/UKBB/UKBB_latest.png';
+const path = 'http://meteoinfo.by/radar/UKBB/UKBB_latest.png';
 //const path = 'http://localhost:8030/borispol-radar2/src/img/meteoradar_borispol.png';
-const path = 'http://localhost:8030/parserain/urbb_debug.jpg';
+//const path = 'http://localhost:8030/parserain/urbb_debug.jpg';
 const mathDate = new MathDate();
 
 const hashDate = {};
@@ -30,6 +30,10 @@ app.get('/parserain', (req, res, next) => {
 	 */
 	const query = url_parts.query;
 	const currentHash = mathDate.getCurrentDate().toISOString() +'.' + query.lat+ '.' +query.lng;
+
+
+	const {lat = 50.44701, lng =30.52002} = query
+
 
 	timeoutClearHasId && clearTimeout(timeoutClearHasId);
 	timeoutClearHasId = setTimeout(()=>{
@@ -64,23 +68,19 @@ app.get('/parserain', (req, res, next) => {
 
 
 				const direction = getDirection(imageMatrix);
-
-			 const dist =	imageMatrix.dist({x:100, y:100}, direction+180)
-			dist
-				//const distanceClass = new DistanceClass(image.bitmap.width, image.bitmap.height);
-			//	distanceClass.setImageMatrix(imageMatrix);
-
-
-
-
-				//resolve(direction ? ''+direction : null)
-				resolve(dist)
+				console.log('direction ->', direction)
+			  const dist =	imageMatrix.distByLatLng({lat: parseFloat(lat), lng:parseFloat(lng)}, direction+180);
+				resolve({
+					dist: dist,
+					isRainy: imageMatrix.isRainy()
+				})
 			})
 		})
 	}
 	hashDate[currentHash].then(result=>{
 		res.setHeader('Content-Type', 'application/json');
-		res.send(JSON.stringify(result, null, 3))
+		res.send(JSON.stringify(result, null, 3));
+		console.log('resolve ->', result)
 	})
 		.catch(err=>{
 			res.status(500).send({error: 'meteoinfo error'});
