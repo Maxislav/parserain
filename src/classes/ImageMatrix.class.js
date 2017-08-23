@@ -1,5 +1,8 @@
 const constantRadarColor = require('../color.constant')
 const MyMath = require('../MyMath');
+const center = require('../radar-center');
+const {getDirection} = require('../get-direction');
+
 /**
  * @extends Array
  */
@@ -15,10 +18,10 @@ class ImageMatrix extends Array {
 		this._height = height;
 		this._scale = 420 / height;
 		/**
-		 * @type {number|null}
+		 * @type {number | null}
 		 * @private
 		 */
-		this._direction = null;
+		this._direction = undefined;
 
 		for (let x = 0; x < this._width; x++) {
 			if (!this[x]) this[x] = [];
@@ -29,15 +32,7 @@ class ImageMatrix extends Array {
 
 	}
 
-	/**
-	 *
-	 * @param {number|null}direction
-	 * @return {ImageMatrix}
-	 */
-	setDirection(direction) {
-		this._direction = direction;
-		return this;
-	}
+
 
 	/**
 	 * Превращает в одномерный массив
@@ -141,6 +136,14 @@ class ImageMatrix extends Array {
 		return this._isRainy
 	}
 
+
+	getDirection(){
+		if(this._direction === undefined){
+			this._direction = getDirection(this)
+		}
+		return this._direction;
+	}
+
 	/**
 	 *
 	 * @param {{lat:number, lng:number}} origin координата в lat lng
@@ -148,7 +151,11 @@ class ImageMatrix extends Array {
 	 * @return {Array}
 	 */
 
-	distByLatLng(origin, a){
+	distByLatLng(origin){
+		const  direction = this.getDirection();
+
+		const a = direction ? direction + 180 : null;
+
 		const x = (this._width/(33.8-27.9)) *(origin.lng - 27.9);
 		const y = (this._height/(52-48.8))* (52 - origin.lat);
 
