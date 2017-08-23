@@ -164,6 +164,12 @@ class ImageMatrix extends Array {
 		return this.distByPixel({x,y}, a);
 	}
 
+	clear(){
+		while (this.length){
+			delete this.pop()
+		}
+	}
+
 
 
 

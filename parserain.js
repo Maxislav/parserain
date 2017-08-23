@@ -86,6 +86,10 @@ app.get('/parserain', (req, res, next) => {
 						dist: imageMatrix.distByLatLng({lat: parseFloat(lat), lng: parseFloat(lng)}) ,
 						isRainy: imageMatrix.isRainy()
 					})
+
+					imageMatrix.clear();
+					delete imageMatrix;
+
 				})
 			}, 20)
 
@@ -108,7 +112,10 @@ app.get('/parserain', (req, res, next) => {
 			ip = ip.replace(/::f+:/, '');
 			res.setHeader('Content-Type', 'application/json');
 			res.send(JSON.stringify(result, null, 3));
-			console.log('resolve ->', i, ip, {direction:result.direction, dist: result.dist.length? result.dist[0] :[], isRainy: result.isRainy })
+
+
+
+			console.log('resolve ->', i, 'ip:', ip, {direction:result.direction, dist: result.dist.length? result.dist[0] :[], isRainy: result.isRainy })
 		})
 		.catch(err => {
 			res.status(500).send({error: 'meteoinfo error'});
