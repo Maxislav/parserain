@@ -70,8 +70,17 @@ app.get('/parserain', (req, res, next) => {
 						imageColor.x = x;
 						imageColor.y = y;
 						imageMatrix[x][y] = imageColor;
-						imageMatrix[x][y] = imageColor;
 					});
+
+					/**
+					 * Удаление мусора
+					 */
+					for(let x = 20; x<26; x++){
+						for(let y = 460; y<480;y++){
+							imageMatrix[x][y] =  new ImageColor(204, 204, 204, 244);
+						}
+					}
+
 					resolve({
 						direction : imageMatrix.getDirection(),
 						dist: imageMatrix.distByLatLng({lat: parseFloat(lat), lng: parseFloat(lng)}) ,
@@ -91,13 +100,15 @@ app.get('/parserain', (req, res, next) => {
 		.promise
 		.then(result => {
 			const i = hashDate[currentHash].i;
-			const ip =  req.headers['x-forwarded-for'] ||
+			let ip =  req.headers['x-forwarded-for'] ||
 				req.connection.remoteAddress ||
 				req.socket.remoteAddress ||
 				req.connection.socket.remoteAddress;
+
+			ip = ip.replace(/::f+:/, '');
 			res.setHeader('Content-Type', 'application/json');
 			res.send(JSON.stringify(result, null, 3));
-			console.log('resolve ->', i, ip)
+			console.log('resolve ->', i, ip, {direction:result.direction, dist: result.dist.length? result.dist[0] :[], isRainy: result.isRainy })
 		})
 		.catch(err => {
 			res.status(500).send({error: 'meteoinfo error'});
